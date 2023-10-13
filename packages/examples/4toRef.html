@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div style="margin-left: 100px" id="app"></div style="margin-left: 100px">
+  <script src="../reactivity/dist/reactivity.global.js"></script>
+
+  <script>
+    const {
+      ref,
+      effect,
+      toRef,
+      reactive
+    } = VueReactivity
+    const obj = reactive({
+      a: 10
+    })
+    const newA = toRef(obj, 'a')
+    console.log(newA)
+    effect(() => {
+      app.innerHTML = newA.value
+    })
+    setTimeout(() => {
+      newA.value = 400
+    }, 500);
+  </script>
+</body>
+
+</html>

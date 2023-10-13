@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div style="margin-left: 100px" id="app"></div style="margin-left: 100px">
+  <script src="../reactivity/dist/reactivity.global.js"></script>
+
+  <script>
+    const {
+      ref,
+      effect,
+      toRefs,
+      reactive
+    } = VueReactivity
+    const obj = reactive({
+      a: 10,
+      b: 'bbb'
+    })
+    const {
+      a,
+      b
+    } = toRefs(obj)
+    console.log(a)
+    effect(() => {
+      app.innerHTML = a.value
+    })
+    setTimeout(() => {
+      a.value = 400
+    }, 500);
+
+    // 插值写法
+    // let App = {
+    //   setup(){
+    //     let state = reactive({name: '张三'})
+    //     return {
+    //       state
+    //     }
+    //   }
+    // }
+    // createApp(App).mount('#app')
+  </script>
+</body>
+
+</html>
