@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div style="margin-left: 100px" id="app"></div style="margin-left: 100px">
+  <script src="../reactivity/dist/reactivity.global.js"></script>
+
+  <script>
+    const {
+      ref,
+      computed
+    } = VueReactivity
+
+
+    const a = ref(10)
+    console.log(1, a.value)
+    const b = computed(() => {
+      return a.value + 100
+    })
+    console.log(2, b.value)
+    setTimeout(() => {
+      a.value = 10
+
+      console.log(3, b.value)
+    }, 500);
+  </script>
+</body>
+
+</html>
