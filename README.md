@@ -4,6 +4,29 @@
 
 项目里面的一些安装包版本与视频里老师用的不一样,注意版本问题,太高版本的会有一些语法错误,目前的 vue 源码也升级了,可以下载一个, 写的时候对照看
 
+项目启动打包会报一个错,
+
+```
+package subpath './package.json' is not defined by "exports" in D:\githupprojects\study\vue3-write\node_modules\tslib\package.json
+```
+
+是因为 node_modules 下面的 tslib 包问题,在 package.json 文件的 exports 对象,最后一行添加 "./_": "./_" 就可以了
+完整的 exports 代码
+
+```
+"exports": {
+        ".": {
+            "module": "./tslib.es6.js",
+            "import": "./modules/index.js",
+            "default": "./tslib.js"
+        },
+        "./": "./",
+        "./*": "./*"
+    }
+```
+
+尝试换了版本,但是会报其他错误, 所以版本不同可能会出现不同问题
+
 ### 实现模块列表:
 
 1. reactive
