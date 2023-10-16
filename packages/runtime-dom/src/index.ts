@@ -5,6 +5,7 @@
 import { extend } from "@vue/shared"
 import { nodeOps } from "./nodeOps"
 import { patchProp } from "./patchProp"
+import { createRender } from "@vue/runtime-core"
 
 const renderOptionDom = extend({ patchProp }, nodeOps)
 
@@ -22,21 +23,6 @@ export const createApp = (rootComponent, rootProps) => {
     mount(container)
   }
   return app
-}
-
-// 渲染方法 放在runtime-core
-function createRender(renderOptionDom) {
-  return {
-    createApp(rootComponent, rootProps) {
-      let app = {
-        mount(container) {
-          // 挂载的位置
-          console.log(rootComponent, rootProps)
-        },
-      }
-      return app
-    },
-  }
 }
 
 // export { renderOptionDom }
