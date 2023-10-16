@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">6666</div>
+  <script src="../packages/runtime-dom/dist/runtime-dom.global.js"></script>
+  <script>
+    const {
+      createApp
+    } = VueRuntimeDom
+    console.log(createApp)
+    let App = {
+      render() {
+        console.log(100)
+      },
+    }
+    createApp(App, {
+      name: "张三",
+      age: 10,
+    }).mount("#app")
+  </script>
+</body>
+
+</html>
