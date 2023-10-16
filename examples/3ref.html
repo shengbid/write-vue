@@ -10,41 +10,24 @@
 
 <body>
   <div style="margin-left: 100px" id="app"></div style="margin-left: 100px">
-  <script src="../reactivity/dist/reactivity.global.js"></script>
+  <script src="../packages/reactivity/dist/reactivity.global.js"></script>
 
   <script>
     const {
       ref,
-      effect,
-      toRefs,
-      reactive
+      effect
     } = VueReactivity
-    const obj = reactive({
-      a: 10,
-      b: 'bbb'
-    })
-    const {
-      a,
-      b
-    } = toRefs(obj)
+    const a = ref(1)
+    let b = 60
     console.log(a)
     effect(() => {
       app.innerHTML = a.value
+      // app.innerHTML = b
     })
     setTimeout(() => {
-      a.value = 400
+      a.value = 666
+      // b = 7777
     }, 500);
-
-    // 插值写法
-    // let App = {
-    //   setup(){
-    //     let state = reactive({name: '张三'})
-    //     return {
-    //       state
-    //     }
-    //   }
-    // }
-    // createApp(App).mount('#app')
   </script>
 </body>
 

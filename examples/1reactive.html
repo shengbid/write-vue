@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+</head>
+
+<body>
+  <script src="../packages/reactivity/dist/reactivity.global.js"></script>
+  <script>
+    let {
+      reactive,
+      shallowReactive,
+      readonly,
+      shallowReadonly,
+    } = VueReactivity
+    let person = reactive({
+      name: "张三",
+      family: {
+        son: "张思",
+      },
+    })
+    let person2 = shallowReactive({
+      name: "张三2",
+      family: {
+        son: "张思2",
+      },
+    })
+    let person3 = readonly({
+      name: "张三3",
+      family: {
+        son: "张思3",
+      },
+    })
+    person3.name = "888"
+    person.name = "8999"
+    console.log(reactive, person.family)
+    console.log(person2.family)
+    console.log(55, person, person2, person3)
+  </script>
+</body>
+
+</html>
