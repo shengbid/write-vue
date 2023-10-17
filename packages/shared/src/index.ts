@@ -28,3 +28,5 @@ export const hasOwn = (target, key) => hasOwnProperty.call(target, key)
 export const isIntegerKey = (key) => parseInt(key) + "" === key
 // 判断两个值是否相等
 export const haseChange = (value, oldValue) => value !== oldValue
+// 导出标识符
+export * from "./shapeFlag"
