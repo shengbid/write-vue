@@ -11,6 +11,7 @@ const renderOptionDom = extend({ patchProp }, nodeOps)
 
 // createApp
 export const createApp = (rootComponent, rootProps) => {
+  // 函数 根据不同平台创建createRender 渲染器
   let app = createRender(renderOptionDom).createApp(rootComponent, rootProps)
   let { mount } = app
   app.mount = function (container) {
