@@ -1,4 +1,5 @@
 import { ShapeFlags } from "@vue/shared"
+import { componentPublicIntance } from "./componentPublicIntance"
 // 创建组件实例
 export const createComponentInstance = (vnode) => {
   // 就是一个对象
@@ -32,6 +33,8 @@ export const setupComponent = (instance) => {
 }
 
 function setupStateComponet(instance) {
+  // 代理
+  instance.proxy = new Proxy(instance.ctx, componentPublicIntance)
   // setup返回值是render函数
   // 获取创建的类型拿到组件setup方法
   let Componet = instance.type
@@ -40,6 +43,7 @@ function setupStateComponet(instance) {
   let setupContext = createContext(instance)
   setup(instance.props, setupContext)
   // render
+  Componet.render(instance)
 }
 
 function createContext(instance) {
