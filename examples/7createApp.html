@@ -16,6 +16,9 @@
       let App = {
         setup(props, context) {
           console.log("setup", props, context)
+          return () => {
+            console.log("setup2")
+          }
         },
         render(proxy) {
           console.log(100, proxy)

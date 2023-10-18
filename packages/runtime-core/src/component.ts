@@ -1,4 +1,4 @@
-import { ShapeFlags } from "@vue/shared"
+import { isFunction, isObject, ShapeFlags } from "@vue/shared"
 import { componentPublicIntance } from "./componentPublicIntance"
 // 创建组件实例
 export const createComponentInstance = (vnode) => {
@@ -12,6 +12,7 @@ export const createComponentInstance = (vnode) => {
     setupState: {}, // setup返回值
     ctx: {}, // 代理 instance.props.name proxy.name
     proxy: {},
+    render: false,
     isMounted: false,
   }
   instance.ctx = { _: instance }
@@ -39,11 +40,42 @@ function setupStateComponet(instance) {
   // 获取创建的类型拿到组件setup方法
   let Componet = instance.type
   let { setup } = Componet
-  // 处理参数
-  let setupContext = createContext(instance)
-  setup(instance.props, setupContext)
+  // 处理参数 判断组件是否有setup render
+  if (setup) {
+    let setupContext = createContext(instance)
+    let setupResult = setup(instance.props, setupContext)
+    // setup的返回值 1对象 2函数
+    // 如果是对象,就将值放在setupState 如果是函数,就是render
+    handlerSetupResult(instance, setupResult)
+  } else {
+    // 调用render
+    finishComponentSetup(instance)
+  }
+
   // render
-  Componet.render(instance)
+  Componet.render(instance.proxy)
+}
+
+function handlerSetupResult(instance, setupResult) {
+  // 1对象 2函数
+  if (isFunction(setupResult)) {
+    instance.render = setupResult // setup返回的函数保存到实例上
+  } else if (isObject(setupResult)) {
+    instance.setupState = setupResult
+  }
+  finishComponentSetup(instance)
+}
+
+function finishComponentSetup(instance) {
+  // 判断一下组件中有没有这个render
+  let Componet = instance.type
+  if (!instance.render) {
+    // 模板编译 render
+    if (!Componet.render && Componet.template) {
+    }
+    instance.render = Componet.render
+  }
+  console.log(55, instance.render.toString())
 }
 
 function createContext(instance) {
@@ -54,5 +86,3 @@ function createContext(instance) {
     expose: () => {},
   }
 }
-
-export const setupRenderEffect = () => {}
