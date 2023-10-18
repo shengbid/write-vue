@@ -11,18 +11,19 @@
     <div id="app">6666</div>
     <script src="../packages/runtime-dom/dist/runtime-dom.global.js"></script>
     <script>
-      const { createApp } = VueRuntimeDom
+      const { createApp, h } = VueRuntimeDom
 
       let App = {
         setup(props, context) {
-          console.log("setup", props, context)
-          return () => {
-            console.log("setup2")
-          }
+          // console.log("setup", props, context)
+          // return () => {
+          //   console.log("setup2")
+          // }
         },
         render(proxy) {
-          console.log(100, proxy)
-          // return h("div", { style: { color: "red" } }, `hello`)
+          // console.log(100, this, proxy)
+          // h函数创建虚拟DOM
+          return h("div", { style: { color: "red" } }, `hello`)
         },
       }
       createApp(App, {
