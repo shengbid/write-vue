@@ -75,7 +75,6 @@ function finishComponentSetup(instance) {
     }
     instance.render = Componet.render
   }
-  console.log(55, instance.render.toString())
 }
 
 function createContext(instance) {
