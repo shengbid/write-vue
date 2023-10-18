@@ -1,3 +1,3 @@
-import { createRender } from "./render"
+export { createRender } from "./render"
 
-export { createRender }
+export { h } from "./h"

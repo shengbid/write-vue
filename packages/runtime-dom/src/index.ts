@@ -27,3 +27,4 @@ export const createApp = (rootComponent, rootProps) => {
 }
 
 // export { renderOptionDom }
+export * from "@vue/runtime-core"
