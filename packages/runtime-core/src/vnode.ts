@@ -40,3 +40,8 @@ function normallizeChildren(vnode, children) {
 
   vnode.shapeFlag = vnode.shapeFlag | type
 }
+
+// 判断是不是一个vnode
+export function isVonde(vnode) {
+  return vnode._v_isVnode
+}
