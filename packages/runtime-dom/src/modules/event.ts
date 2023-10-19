@@ -9,7 +9,7 @@ export const patchEvent = (el, key, value) => {
   } else {
     // 获取事件名称 1新值没有 2新值没有
 
-    const eventName = key.slice(2).toLowerCase
+    const eventName = key.slice(2).toLowerCase()
     if (value) {
       // 新值有
       let invoker = (invokers[eventName] = createInvoker(value))
