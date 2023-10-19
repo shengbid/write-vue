@@ -11,19 +11,33 @@
     <div id="app">6666</div>
     <script src="../packages/runtime-dom/dist/runtime-dom.global.js"></script>
     <script>
-      const { createApp, h } = VueRuntimeDom
+      const { createApp, h, reactive } = VueRuntimeDom
 
       let App = {
         setup(props, context) {
           // console.log("setup", props, context)
+          let state = reactive({ name: "张三1" })
           // return () => {
           //   console.log("setup2")
+          //   // return h("div", { style: { color: "red" } }, state.name)
           // }
+          const fn = () => {
+            state.name = "李四1"
+          }
+          return {
+            state,
+            fn,
+          }
         },
         render(proxy) {
           // console.log(100, this, proxy)
+          console.log(100, proxy.state)
           // h函数创建虚拟DOM
-          return h("div", { style: { color: "red" } }, ["hello9999999"])
+          return h(
+            "div",
+            { style: { color: "red", marginLeft: "40px" }, onClick: proxy.fn },
+            proxy.state.name
+          )
         },
       }
       createApp(App, {
