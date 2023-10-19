@@ -45,3 +45,11 @@ function normallizeChildren(vnode, children) {
 export function isVonde(vnode) {
   return vnode._v_isVnode
 }
+
+// 元素的children 变成vnode
+export const TEXT = Symbol("text")
+export function CVnode(child) {
+  // ['text'] [h()]
+  if (isObject(child)) return child
+  return createVnode(TEXT, null, String(child))
+}
