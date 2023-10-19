@@ -16,7 +16,7 @@
       let App = {
         setup(props, context) {
           // console.log("setup", props, context)
-          let state = reactive({ name: "张三1" })
+          let state = reactive({ name: "张三1", isFlag: false })
           // return () => {
           //   console.log("setup2")
           //   // return h("div", { style: { color: "red" } }, state.name)
@@ -24,6 +24,9 @@
           const fn = () => {
             state.name = "李四1"
           }
+          setTimeout(() => {
+            state.isFlag = true
+          }, 2000)
           return {
             state,
             fn,
@@ -31,13 +34,27 @@
         },
         render(proxy) {
           // console.log(100, this, proxy)
-          console.log(100, proxy.state)
+          // console.log(100, proxy.state)
           // h函数创建虚拟DOM
-          return h(
-            "div",
-            { style: { color: "red", marginLeft: "40px" }, onClick: proxy.fn },
-            proxy.state.name
-          )
+          if (proxy.state.isFlag) {
+            return h(
+              "div",
+              {
+                style: { color: "red", marginLeft: "40px" },
+                onClick: proxy.fn,
+              },
+              "hello"
+            )
+          } else {
+            return h(
+              "div",
+              {
+                style: { color: "blue", marginLeft: "40px" },
+                onClick: proxy.fn,
+              },
+              "hello"
+            )
+          }
         },
       }
       createApp(App, {

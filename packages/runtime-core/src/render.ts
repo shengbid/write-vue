@@ -26,12 +26,19 @@ export function createRender(renderOptionDom) {
       if (!instance.isMounted) {
         // 获取到render的返回值
         let proxy = instance.proxy
-        let subTree = instance.render.call(proxy, proxy) // 执行render
+        let subTree = (instance.subTree = instance.render.call(proxy, proxy)) // 执行render
         // 组件渲染的节点
         // 渲染子树
         patch(null, subTree, container)
+        instance.isMounted = true
       } else {
         console.log("更新")
+        // 比对 旧值和新值
+        let proxy = instance.proxy
+        const prevTree = instance.subTree
+        const nextTree = instance.render.call(proxy, proxy)
+        instance.subTree = nextTree
+        patch(prevTree, nextTree, container)
       }
     })
   }
@@ -82,7 +89,7 @@ export function createRender(renderOptionDom) {
     // vnode h()
     const { props, shapeFlag, type, children } = vnode
     // 创建的元素
-    let el = hostCreateElement(type)
+    let el = (vnode.el = hostCreateElement(type))
     // 添加属性
     if (props) {
       for (let key in props) {
@@ -103,16 +110,69 @@ export function createRender(renderOptionDom) {
     // 放到对应的位置
     hostInsert(el, container)
   }
+  // 属性比对
+  const patchProps = (el, oldProps, newProps) => {
+    // 旧的有这个属性, 新的没有
+    // 循环
+    if (oldProps != newProps) {
+      for (let key in newProps) {
+        const prev = oldProps[key]
+        const next = newProps[key]
+        if (next != prev) {
+          hostPatchProp(el, key, prev, next)
+        }
+      }
+    }
+    // 如果旧的里面的属性 新值没有,删除
+    for (let key in oldProps) {
+      if (!(key in newProps)) {
+        hostPatchProp(el, key, oldProps[key], null)
+      }
+    }
+  }
+  // 比对children
+  const patchChild = (n1,n2,el) =>{
+    const c1 = n1.children
+    const c2 = n2.children
+    // 子元素比对,4种情况
+    
+  }
+  // 同一个元素比对
+  const patchElement = (n1, n2, container) => {
+    let el = (n2.el = n1.el) // 获取元素真实节点
+    const oldProps = n1.props || {}
+    const newProps = n2.props || {}
+    // 比对属性
+    patchProps(el, oldProps, newProps)
+    // 比对children
+    patchChild(n1,n2,el)
+  }
   function processElement(n1, n2, container) {
     if (n1 == null) {
       mountElement(n2, container)
     } else {
-      // 更新
+      // 更新 同一个元素
+      // 比对属性
+      patchElement(n1, n2, container)
     }
   }
   //---------------------------------------------
 
+  // 删除元素
+  const unmount = (vnode) => {
+    hostRemove(vnode.el)
+  }
+  // 判断是不是同一个元素
+  const isSomeVnode = (n1, n2) => {
+    return n1.type == n2.type && n1.key == n2.key
+  }
   const patch = (n1, n2, container) => {
+    // 比对是不是同一个 1判断是不是同一个元素 2同一元素 比对 props children...
+    if (n1 && !isSomeVnode(n1, n2)) {
+      // 有旧值, 不是同一个元素,直接替换
+      unmount(n1)
+      n1 = null // 组件加载, 走下面的步骤
+    }
     // 针对不同的类型 1组件 2元素 3文本
     let { shapeFlag, type } = n2
     switch (type) {
