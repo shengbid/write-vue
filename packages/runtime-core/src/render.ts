@@ -30,6 +30,8 @@ export function createRender(renderOptionDom) {
         // 组件渲染的节点
         // 渲染子树
         patch(null, subTree, container)
+      } else {
+        console.log("更新")
       }
     })
   }

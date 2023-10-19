@@ -15,7 +15,7 @@ export const patchProp = (el, key, prevValue, nextValue) => {
       break
 
     default:
-      if (/^on[^a-z]/.test(key)) {
+      if (/^on[^a-z]*/.test(key)) {
         // 是不是事件
         patchEvent(el, key, nextValue)
       } else {
