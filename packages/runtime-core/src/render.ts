@@ -236,7 +236,7 @@ export function createRender(renderOptionDom) {
           patch(oldChildVnode, c2[newIndex], el)
         }
       }
-      console.log(newIndexToPatchMap)
+
       // 移动节点 添加新增的元素 方法 倒序循环
       for (let i = toBePatched - 1; i >= 0; i--) {
         let currentIndex = i + s2 // 新增元素的索引
@@ -246,8 +246,13 @@ export function createRender(renderOptionDom) {
           currentIndex + 1 < c2.length ? c2[currentIndex + 1].el : null
         // 第一次插入新元素
         if (newIndexToPatchMap[i] === 0) {
+          // 插入新元素
           patch(null, child, el, ancher)
         } else {
+          // 调整数组排序
+          // 此时数据是旧的数据的排序, 根据新的顺序插入, 会去掉原来的数据
+          // 重复插入相同数据,旧数据会去掉,显示最新插入的数据
+          // hostInsert(child.el, el, ancher) // 调用两次插入,最终只会有一个数据
           hostInsert(child.el, el, ancher)
         }
       }
