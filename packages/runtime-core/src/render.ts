@@ -32,7 +32,7 @@ export function createRender(renderOptionDom) {
         patch(null, subTree, container)
         instance.isMounted = true
       } else {
-        console.log("更新")
+        // console.log("更新")
         // 比对 旧值和新值
         let proxy = instance.proxy
         const prevTree = instance.subTree
@@ -84,7 +84,7 @@ export function createRender(renderOptionDom) {
     }
   }
 
-  function mountElement(vnode, container) {
+  function mountElement(vnode, container, ancher) {
     // 递归 渲染
     // vnode h()
     const { props, shapeFlag, type, children } = vnode
@@ -108,7 +108,7 @@ export function createRender(renderOptionDom) {
       }
     }
     // 放到对应的位置
-    hostInsert(el, container)
+    hostInsert(el, container, ancher)
   }
   // 属性比对
   const patchProps = (el, oldProps, newProps) => {
@@ -131,29 +131,145 @@ export function createRender(renderOptionDom) {
     }
   }
   // 比对children
-  const patchChild = (n1,n2,el) =>{
+  const patchChild = (n1, n2, el) => {
     const c1 = n1.children
     const c2 = n2.children
     // 子元素比对,4种情况
-    
+    // 1旧的有 新值没有 2新的有 旧值没有 3都是文本 4 都是数组
+    // 都是文本
+    const prevShapeFlage = n1.shapeFlag // 旧的标识
+    const newShapeFlag = n2.shapeFlag // 新的标识
+    // 新的是文本,直接替换旧值
+    if (newShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      hostSetElementText(el, c2)
+    } else {
+      // 新的不是文本 就是数组
+      if (prevShapeFlage & ShapeFlags.ARRAY_CHILDREN) {
+        // 旧的是数组 新的也是数组
+        patchkeyChild(c1, c2, el)
+      } else {
+        // 旧的是文本, 删除旧文本添加新数组
+        hostSetElementText(el, "")
+        // 添加新数组
+        mountChildren(el, c2)
+      }
+    }
+  }
+  // 都是数组的情况
+  const patchkeyChild = (c1, c2, el) => {
+    // vue2 双指针 vue3同步
+    // sync from start 头部比对
+    let i = 0
+    let e1 = c1.length - 1
+    let e2 = c2.length - 1
+    // 1 同一位置比对(两个元素不同 停止) 2 哪个数组没有停止
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i]
+      const n2 = c2[i]
+      if (isSomeVnode(n1, n2)) {
+        patch(n1, n2, el)
+      } else {
+        break
+      }
+      i++ // 对比的位置
+    }
+    // aync from end 尾部比对
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1]
+      const n2 = c2[e2]
+      if (isSomeVnode(n1, n2)) {
+        patch(n1, n2, el)
+      } else {
+        break
+      }
+      e1-- // 对比的位置
+      e2--
+    }
+    console.log(i, e1, e2)
+    // 特殊情况
+    // 1 新的数据多 旧数据少
+    if (i > e1) {
+      // 添加数据 头部添加还是尾部添加
+      const nextProps = e2 + 1
+      // 判断是前面插入 还是后面添加
+      const ancher = nextProps < c2.length ? c2[nextProps].el : null
+      while (i <= e2) {
+        patch(null, c2[i++], el, ancher)
+      }
+    } else if (i > e2) {
+      // 2旧的数据多 新的数据少 (尾部多(头部比较) 头部多(尾部比较))
+      // 删除多的数据
+      while (e1 >= i) {
+        unmount(c1[e1--])
+      }
+    } else {
+      // 乱序
+      // 解决思路 1 以新的乱序个数创建一个映射表 2在用旧的乱序 的数据去新的表中找
+      // 如果有就复用 没有就删除
+      let s1 = i
+      let s2 = i
+      // 解决乱序比对的问题 1比对后数组位置不对 2新创建元素没添加
+      const toBePatched = e2 - s2 + 1 // 乱序的个数
+
+      // 创建数组
+      const newIndexToPatchMap = new Array(toBePatched).fill(0)
+
+      // 创建表
+      let keyIndexMap = new Map()
+
+      // 用新的乱序的数据创建表
+      for (let i = s2; i <= e2; i++) {
+        const childVnode = c2[i] // 获取到的是乱序的vnode
+        keyIndexMap.set(childVnode.key, i)
+      }
+      // 去旧的里面比对
+      for (let i = s1; i <= e1; i++) {
+        const oldChildVnode = c1[i]
+        let newIndex = keyIndexMap.get(oldChildVnode.key)
+        if (newIndex == undefined) {
+          // 如果旧的数据没有
+          unmount(oldChildVnode)
+        } else {
+          // 旧的和新的关系 索引的关系
+          newIndexToPatchMap[newIndex - s2] = i + 1 // 就是老的索引的位置
+          // 如果旧的数据也有 比对
+          patch(oldChildVnode, c2[newIndex], el)
+        }
+      }
+      console.log(newIndexToPatchMap)
+      // 移动节点 添加新增的元素 方法 倒序循环
+      for (let i = toBePatched - 1; i >= 0; i--) {
+        let currentIndex = i + s2 // 新增元素的索引
+        let child = c2[currentIndex]
+        // 添加位置
+        let ancher =
+          currentIndex + 1 < c2.length ? c2[currentIndex + 1].el : null
+        // 第一次插入新元素
+        if (newIndexToPatchMap[i] === 0) {
+          patch(null, child, el, ancher)
+        } else {
+          hostInsert(child.el, el, ancher)
+        }
+      }
+    }
   }
   // 同一个元素比对
-  const patchElement = (n1, n2, container) => {
+  const patchElement = (n1, n2, container, ancher) => {
     let el = (n2.el = n1.el) // 获取元素真实节点
     const oldProps = n1.props || {}
     const newProps = n2.props || {}
     // 比对属性
     patchProps(el, oldProps, newProps)
     // 比对children
-    patchChild(n1,n2,el)
+    patchChild(n1, n2, el)
   }
-  function processElement(n1, n2, container) {
+  function processElement(n1, n2, container, ancher) {
     if (n1 == null) {
-      mountElement(n2, container)
+      mountElement(n2, container, ancher)
     } else {
       // 更新 同一个元素
       // 比对属性
-      patchElement(n1, n2, container)
+      patchElement(n1, n2, container, ancher)
     }
   }
   //---------------------------------------------
@@ -166,7 +282,7 @@ export function createRender(renderOptionDom) {
   const isSomeVnode = (n1, n2) => {
     return n1.type == n2.type && n1.key == n2.key
   }
-  const patch = (n1, n2, container) => {
+  const patch = (n1, n2, container, ancher = null) => {
     // 比对是不是同一个 1判断是不是同一个元素 2同一元素 比对 props children...
     if (n1 && !isSomeVnode(n1, n2)) {
       // 有旧值, 不是同一个元素,直接替换
@@ -182,7 +298,7 @@ export function createRender(renderOptionDom) {
       default:
         if (shapeFlag & ShapeFlags.ELEMENT) {
           // 元素 处理元素 加载组件
-          processElement(n1, n2, container)
+          processElement(n1, n2, container, ancher)
         } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
           // 组件
           processComponent(n1, n2, container)

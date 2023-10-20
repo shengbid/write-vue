@@ -43,7 +43,13 @@
                 style: { color: "red", marginLeft: "40px" },
                 onClick: proxy.fn,
               },
-              "hello"
+              [
+                h("p", { key: "A" }, "A"),
+                h("p", { key: "D" }, "D"),
+                h("p", { key: "C" }, "C"),
+                h("p", { key: "f" }, "f"),
+                h("p", { key: "B" }, "B"),
+              ]
             )
           } else {
             return h(
@@ -52,7 +58,14 @@
                 style: { color: "blue", marginLeft: "40px" },
                 onClick: proxy.fn,
               },
-              "hello"
+              [
+                h("p", { key: "A" }, "A"),
+                h("p", { key: "D" }, "D"),
+                h("p", { key: "h" }, "h"),
+                h("p", { key: "D2" }, "D2"),
+                h("p", { key: "B" }, "B"),
+                h("p", { key: "C" }, "C"),
+              ]
             )
           }
         },
