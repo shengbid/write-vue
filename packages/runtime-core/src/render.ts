@@ -199,8 +199,9 @@ export function createRender(renderOptionDom) {
     } else if (i > e2) {
       // 2旧的数据多 新的数据少 (尾部多(头部比较) 头部多(尾部比较))
       // 删除多的数据
-      while (e1 >= i) {
-        unmount(c1[e1--])
+      while (i <= e1) {
+        unmount(c1[i])
+        i++
       }
     } else {
       // 乱序
