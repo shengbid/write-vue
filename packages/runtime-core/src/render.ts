@@ -239,6 +239,9 @@ export function createRender(renderOptionDom) {
       }
 
       // 移动节点 添加新增的元素 方法 倒序循环
+      const increasingNewIndexSequence = getSequence(newIndexToPatchMap)
+      console.log(increasingNewIndexSequence)
+      let j = increasingNewIndexSequence.length - 1
       for (let i = toBePatched - 1; i >= 0; i--) {
         let currentIndex = i + s2 // 新增元素的索引
         let child = c2[currentIndex]
@@ -254,7 +257,12 @@ export function createRender(renderOptionDom) {
           // 此时数据是旧的数据的排序, 根据新的顺序插入, 会去掉原来的数据
           // 重复插入相同数据,旧数据会去掉,显示最新插入的数据
           // hostInsert(child.el, el, ancher) // 调用两次插入,最终只会有一个数据
-          hostInsert(child.el, el, ancher)
+          if (i != increasingNewIndexSequence[j]) {
+            hostInsert(child.el, el, ancher)
+          } else {
+            // 相同的不需要再插入
+            j--
+          }
         }
       }
     }
@@ -277,6 +285,48 @@ export function createRender(renderOptionDom) {
       // 比对属性
       patchElement(n1, n2, container, ancher)
     }
+  }
+
+  // 最长递增子序列
+  const getSequence = (arr) => {
+    const p = arr.slice()
+    const result = [0]
+    let i, j, u, v, c
+    const len = arr.length
+    for (i = 0; i < len; i++) {
+      const arrI = arr[i]
+      if (arrI !== 0) {
+        j = result[result.length - 1]
+        if (arr[j] < arrI) {
+          p[i] = j
+          result.push(i)
+          continue
+        }
+        u = 0
+        v = result.length - 1
+        while (u < v) {
+          c = (u + v) >> 1
+          if (arr[result[c]] < arrI) {
+            u = c + 1
+          } else {
+            v = c
+          }
+        }
+        if (arrI < arr[result[u]]) {
+          if (u > 0) {
+            p[i] = result[u - 1]
+          }
+          result[u] = i
+        }
+      }
+    }
+    u = result.length
+    v = result[u - 1]
+    while (u-- > 0) {
+      result[u] = v
+      v = p[v]
+    }
+    return result
   }
   //---------------------------------------------
 
