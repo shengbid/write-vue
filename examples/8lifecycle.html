@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app">递增的数据: {{num}}</div>
+  <script src="../packages/runtime-dom/dist/runtime-dom.global.js"></script>
+  <script>
+    const {
+      createApp,
+      h,
+      reactive,
+      toRefs,
+      onBeforeMount,
+      onMounted,
+      onBeforeUpdate,
+      onUpdated
+    } = VueRuntimeDom
+    let app = {
+      setup() {
+        // setup相当于 beforeCreate created
+        // 生命周期函数必须写在setup里面
+        // 3 vue2中的生命周期 this 指向组件实例
+
+        // 什么时候产生关联
+        // 在调用setup之前将这个实例暴露到全局上,在调用时,内部执行调用生命周期,在调用getCurrentInstance 获取到组件实例
+
+        const state = reactive({
+          num: 0
+        })
+
+        onBeforeMount(() => {
+          console.log('onBeforeMount')
+        })
+        onMount(() => {
+          console.log('onMount')
+          const instance = getCurrentInstance()
+          // 获取this 当前组件实例 getCurrentInstance()
+          console.log(instance)
+        })
+        onBeforeUpdate(() => {
+          console.log('onBeforeUpdate')
+        })
+        onUpdated(() => {
+          console.log('onUpdated')
+        })
+        setTimeout(() => {
+          state.num++
+        }, 1000)
+
+        return {
+          ...toRefs(state)
+        }
+      }
+    }
+    createApp(app).mount('#app')
+  </script>
+</body>
+
+</html>
