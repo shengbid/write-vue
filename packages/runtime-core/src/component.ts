@@ -33,6 +33,8 @@ export const setupComponent = (instance) => {
   }
 }
 
+// 处理setup
+export let currentInstance
 function setupStateComponet(instance) {
   // 代理
   instance.proxy = new Proxy(instance.ctx, componentPublicIntance)
@@ -42,8 +44,12 @@ function setupStateComponet(instance) {
   let { setup } = Componet
   // 处理参数 判断组件是否有setup render
   if (setup) {
+    // setup之前 创建全局的currentInstance
+    currentInstance = instance
     let setupContext = createContext(instance)
     let setupResult = setup(instance.props, setupContext)
+    // setup执行完毕
+    currentInstance = null
     // setup的返回值 1对象 2函数
     // 如果是对象,就将值放在setupState 如果是函数,就是render
     handlerSetupResult(instance, setupResult)
