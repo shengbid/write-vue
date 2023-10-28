@@ -18,6 +18,7 @@
       reactive,
       onBeforeMount,
       onMounted,
+      getCurrentInstance,
       onBeforeUpdate,
       onUpdated,
     } = VueRuntimeDom
@@ -31,7 +32,7 @@
         // 在调用setup之前将这个实例暴露到全局上,在调用时,内部执行调用生命周期,在调用getCurrentInstance 获取到组件实例
 
         const state = reactive({
-          num: 0,
+          num: 100,
         })
 
         onBeforeMount(() => {
@@ -50,7 +51,7 @@
           console.log("onUpdated")
         })
         setTimeout(() => {
-          state.num += 3
+          state.num = 300
         }, 1000)
         return {
           state
