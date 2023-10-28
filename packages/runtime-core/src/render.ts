@@ -3,6 +3,8 @@ import { ShapeFlags } from "@vue/shared"
 import { apiCreateApp } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component"
 import { CVnode, TEXT } from "./vnode"
+import { invokeArrayFns } from "./apilifecycle"
+
 // 渲染方法 放在runtime-core
 export function createRender(renderOptionDom) {
   // 获取全部的DOM操作
@@ -24,21 +26,38 @@ export function createRender(renderOptionDom) {
       // render方法中获取数据会收集effect, 属性改变 会重新执行
       // 判断 第一次加载
       if (!instance.isMounted) {
+        // 渲染之前
+        let { bm, m } = instance // 将生命周期放在实例上
+        if (bm) {
+          invokeArrayFns(bm)
+        }
         // 获取到render的返回值
         let proxy = instance.proxy
         let subTree = (instance.subTree = instance.render.call(proxy, proxy)) // 执行render
         // 组件渲染的节点
         // 渲染子树
         patch(null, subTree, container)
+        // 渲染完成
+        if (m) {
+          // 怎么执行生命周期钩子函数
+          invokeArrayFns(m)
+        }
         instance.isMounted = true
       } else {
         // console.log("更新")
         // 比对 旧值和新值
+        let { u, bu } = instance
+        if (bu) {
+          invokeArrayFns(bu)
+        }
         let proxy = instance.proxy
         const prevTree = instance.subTree
         const nextTree = instance.render.call(proxy, proxy)
         instance.subTree = nextTree
         patch(prevTree, nextTree, container)
+        if (u) {
+          invokeArrayFns(u)
+        }
       }
     })
   }
