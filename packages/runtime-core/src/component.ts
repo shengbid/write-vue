@@ -1,5 +1,15 @@
 import { isFunction, isObject, ShapeFlags } from "@vue/shared"
 import { componentPublicIntance } from "./componentPublicIntance"
+
+// 获取当前实例
+export const getCurrentInstance = () => {
+  return currentInstance
+}
+// 设置当前实例
+export const setCurrentInstance = (target) => {
+  currentInstance = target
+}
+
 // 创建组件实例
 export const createComponentInstance = (vnode) => {
   // 就是一个对象
